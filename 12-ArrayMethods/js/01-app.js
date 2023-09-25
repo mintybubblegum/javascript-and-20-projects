@@ -1,3 +1,5 @@
+// SOME se utiliza en array tradicional y en array de objetos
+
 const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'];
 
 const carrito = [
@@ -8,3 +10,9 @@ const carrito = [
     { nombre: 'Teclado', precio: 400 },
     { nombre: 'Celular', precio: 700 },
 ]
+
+const existe = carrito.some( producto => producto.nombre === 'Monitor curvo' );
+console.log(existe); //false
+
+const existe2 = meses.some( mes => mes === 'Febrero' );
+console.log(existe2); //true
