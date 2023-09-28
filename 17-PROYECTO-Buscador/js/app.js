@@ -26,7 +26,7 @@ const datosBusqueda = {
 
 // Eventos
 document.addEventListener('DOMContentLoaded', () => {
-    mostrarAutos(); // muestra los autos al cargar
+    mostrarAutos(autos); // muestra los autos al cargar
 
     // Llena las opciones de años
     llenarSelect();
@@ -35,37 +35,44 @@ document.addEventListener('DOMContentLoaded', () => {
 // Event listener para los select de busqueda
 marca.addEventListener('change', e => { // cada vez que pulso en el select se manda ese value al objeto datosBusqueda.marca y filtrar segun marca
     datosBusqueda.marca = e.target.value;
-
     filtrarAuto();
 })
 
 year.addEventListener('change', e => {
     datosBusqueda.year = parseInt(e.target.value);
-    filtrarAuto()
-})
-
-maximo.addEventListener('change', e => {
-    datosBusqueda.maximo = e.target.value;
+    filtrarAuto();
 })
 
 minimo.addEventListener('change', e => {
     datosBusqueda.minimo = e.target.value;
+    filtrarAuto();
+})
+
+maximo.addEventListener('change', e => {
+    datosBusqueda.maximo = e.target.value;
+    filtrarAuto();
 })
 
 puertas.addEventListener('change', e => {
-    datosBusqueda.puertas = e.target.value;
+    datosBusqueda.puertas = parseInt(e.target.value);
+    filtrarAuto();
 })
 
 transmision.addEventListener('change', e => {
     datosBusqueda.transmision = e.target.value;
+    filtrarAuto();
 })
 
 color.addEventListener('change', e => {
     datosBusqueda.color = e.target.value;
+    filtrarAuto();
 })
 
 // Funciones
-function mostrarAutos() {
+function mostrarAutos(autos) {
+
+    limpiarHTML(); // Elimina el HTML previo
+
     autos.forEach( automovil => {
         
         const { marca, modelo, year, puertas, transmision, precio, color } = automovil;
@@ -73,12 +80,18 @@ function mostrarAutos() {
 
         autoHTML.textContent = `
             ${marca} ${modelo} - ${year} - ${puertas} Puertas - Transmisión: ${transmision} - Precio: ${precio}€ - Color: ${color}
-
         `;
 
         // insertar funcion en html
         resultado.appendChild(autoHTML);
     })
+}
+
+// Limpiar HTML
+function limpiarHTML(){
+    while(resultado.firstChild){
+        resultado.removeChild(resultado.firstChild);
+    }
 }
 
 // Genera los años del select
@@ -92,9 +105,24 @@ function llenarSelect(){
 }
 
 function filtrarAuto(){ //higher-order function === funcion dentro de otra. Filtrar marca como funcion
-    const resultado = autos.filter( filtrarMarca ).filter( filtrarYear );
-    console.log(resultado);
+    const resultado = autos.filter( filtrarMarca ).filter( filtrarYear ).filter( filtrarMinimo ).filter( filtrarMaximo ).filter( filtrarPuertas ).filter( filtrarTransmision ).filter( filtrarColor );
+
+    if(resultado.length){
+        mostrarAutos(resultado);
+    } else {
+        noResultado();
+    }
 }
+
+function noResultado(){
+
+    limpiarHTML();
+
+    const noResultAlert = document.createElement('div');
+    noResultAlert.classList.add('alerta', 'error');
+    noResultAlert.textContent = 'No hay resultados. Intenta con otros términos de búsqueda'
+    resultado.appendChild(noResultAlert);
+};
 
 function filtrarMarca(auto){ // si hay algun valor en el filtro de marca los muestro y sino, los traigo todos
     const { marca } = datosBusqueda;
@@ -108,6 +136,42 @@ function filtrarYear(auto){
     const { year } = datosBusqueda;
     if( year ){
         return auto.year === year;
+    }
+    return auto;
+}
+
+function filtrarMinimo(auto){
+    const { minimo } = datosBusqueda;
+    if( minimo ){
+        return auto.precio >= minimo;
+    }
+    return auto;
+}
+function filtrarMaximo(auto){
+    const { maximo } = datosBusqueda;
+    if( maximo ){
+        return auto.precio <= maximo;
+    }
+    return auto;
+}
+function filtrarPuertas(auto){
+    const { puertas } = datosBusqueda;
+    if( puertas ){
+        return auto.puertas === puertas;
+    }
+    return auto;
+}
+function filtrarTransmision(auto){
+    const { transmision } = datosBusqueda;
+    if( transmision ){
+        return auto.transmision === transmision;
+    }
+    return auto;
+}
+function filtrarColor(auto){
+    const { color } = datosBusqueda;
+    if( color ){
+        return auto.color === color;
     }
     return auto;
 }
