@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function validar(e) {
-        if(e.target.value.trim() === '') { // el método trim elimina los espacios en blanco de un input, para que user no "haga trampas"
+        if(e.target.value.trim() === '' && e.target.id !== 'cc') { // marcamos como obligatorios todos los valores menos el 'CC'
             mostrarAlerta(`El campo ${e.target.id} es obligatorio`, e.target.parentElement);
             emailInfo[e.target.name] = '';
             comprobarEmail();
@@ -72,9 +72,9 @@ document.addEventListener('DOMContentLoaded', function(){
             return;
         }
         
-        if(e.target.id === 'cc' && !validarEmail(e.target.value)){
+        if(e.target.id === 'cc' && !validarEmail(e.target.value)){ //si el CC está lleno pero el email no es válido 
             mostrarAlerta('El email no es válido', e.target.parentElement);
-            emailInfo[e.target.name] = '';
+            emailInfo[e.target.name] = e.target.value.trim().toLowerCase(); //asignamos valor a CC
             comprobarEmail();
             return;
         }
@@ -116,7 +116,16 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function comprobarEmail(){
-        if(Object.values(emailInfo).includes('')){
+        let disabledInfo = false;
+        Object.values(emailInfo).forEach((item, indice) => {
+            if(indice !== 1 && item.trim() === ''){
+                disabledInfo = true;
+            }
+            if(indice === 1 && item.trim() !== '' && !validarEmail(item)){ //* si el indice es CC(1), está vacío y el email no es válido el botón de enviar va a estar desactivado y no se puede pulsar
+                disabledInfo = true;
+            }
+        })
+        if(disabledInfo){
             btnSubmit.classList.add('opacity-50');
             btnSubmit.disabled = true;
             return;
